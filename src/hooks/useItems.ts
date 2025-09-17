@@ -13,6 +13,8 @@ export function useItems() {
       if (stored) {
         const parsedItems = JSON.parse(stored).map((item: any) => ({
           ...item,
+          categoryTags: item.categoryTags || [],
+          calendarTags: item.calendarTags || [],
           createdAt: new Date(item.createdAt),
           updatedAt: new Date(item.updatedAt),
         }));
@@ -57,8 +59,17 @@ export function useItems() {
     setItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const getItemsForMonth = (month: number) => {
-    return items.filter(item => item.months.includes(month));
+  const getItemsForMonth = (month: number, calendarTags: any[] = []) => {
+    return items.filter(item => {
+      // Direct month assignment
+      if (item.months.includes(month)) return true;
+      
+      // Calendar tag assignment
+      const itemCalendarTags = calendarTags.filter(tag => 
+        item.calendarTags.includes(tag.id)
+      );
+      return itemCalendarTags.some(tag => tag.months?.includes(month));
+    });
   };
 
   return {

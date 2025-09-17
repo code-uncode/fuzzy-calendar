@@ -1,8 +1,18 @@
+export interface Tag {
+  id: string;
+  name: string;
+  type: 'category' | 'calendar';
+  months?: number[]; // Only for calendar tags
+  createdAt: Date;
+}
+
 export interface CalendarItem {
   id: string;
   name: string;
   description: string;
-  months: number[]; // Array of month numbers (0-11)
+  months: number[]; // Directly assigned months
+  categoryTags: string[]; // Tag IDs, max 5
+  calendarTags: string[]; // Tag IDs, max 5
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,33 +1,82 @@
 import { useState } from 'react';
 import { useItems } from '@/hooks/useItems';
+import { useTags } from '@/hooks/useTags';
 import { MonthGrid } from '@/components/MonthGrid';
 import { ItemsList } from '@/components/ItemsList';
 import { ItemModal } from '@/components/ItemModal';
+import { TagModal } from '@/components/TagModal';
+import { TagsList } from '@/components/TagsList';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CalendarItem, MONTHS } from '@/types/item';
-import { Plus, Calendar, ArrowLeft } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CalendarItem, MONTHS, Tag } from '@/types/item';
+import { Plus, Calendar, ArrowLeft, Hash, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { items, addItem, updateItem, deleteItem, getItemsForMonth } = useItems();
+  const { 
+    tags, 
+    addTag, 
+    updateTag, 
+    deleteTag, 
+    getCategoryTags, 
+    getCalendarTags, 
+    getMonthsFromCalendarTags 
+  } = useTags();
+  
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CalendarItem | null>(null);
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const [activeTab, setActiveTab] = useState('calendar');
   const { toast } = useToast();
+
+  const categoryTags = getCategoryTags();
+  const calendarTags = getCalendarTags();
+
+  // Enhanced getItemsForMonth to include calendar tag filtering
+  const getItemsForMonthWithTags = (month: number) => {
+    return items.filter(item => {
+      // Direct month assignment
+      if (item.months.includes(month)) return true;
+      
+      // Calendar tag assignment
+      if (item.calendarTags?.length > 0) {
+        const itemCalendarTags = calendarTags.filter(tag => 
+          item.calendarTags.includes(tag.id)
+        );
+        return itemCalendarTags.some(tag => tag.months?.includes(month));
+      }
+      
+      return false;
+    });
+  };
 
   const handleMonthSelect = (month: number) => {
     setSelectedMonth(selectedMonth === month ? null : month);
+    setActiveTab('calendar');
   };
 
   const handleAddItem = () => {
     setEditingItem(null);
-    setIsModalOpen(true);
+    setIsItemModalOpen(true);
   };
 
   const handleEditItem = (item: CalendarItem) => {
     setEditingItem(item);
-    setIsModalOpen(true);
+    setIsItemModalOpen(true);
+  };
+
+  const handleAddTag = () => {
+    setEditingTag(null);
+    setIsTagModalOpen(true);
+  };
+
+  const handleEditTag = (tag: Tag) => {
+    setEditingTag(tag);
+    setIsTagModalOpen(true);
   };
 
   const handleSaveItem = (itemData: Omit<CalendarItem, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -55,13 +104,38 @@ const Index = () => {
     });
   };
 
-  const selectedMonthItems = selectedMonth !== null ? getItemsForMonth(selectedMonth) : [];
+  const handleSaveTag = (tagData: Omit<Tag, 'id' | 'createdAt'>) => {
+    addTag(tagData);
+    toast({
+      title: "Tag created!",
+      description: `"${tagData.name}" tag has been created.`,
+    });
+  };
+
+  const handleUpdateTag = (id: string, updates: Partial<Omit<Tag, 'id' | 'createdAt'>>) => {
+    updateTag(id, updates);
+    toast({
+      title: "Tag updated!",
+      description: "Your tag has been successfully updated.",
+    });
+  };
+
+  const handleDeleteTag = (id: string) => {
+    const tag = tags.find(t => t.id === id);
+    deleteTag(id);
+    toast({
+      title: "Tag deleted!",
+      description: tag ? `"${tag.name}" tag has been removed.` : "Tag has been removed.",
+    });
+  };
+
+  const selectedMonthItems = selectedMonth !== null ? getItemsForMonthWithTags(selectedMonth) : [];
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Calendar className="h-8 w-8 text-primary" />
             <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
@@ -69,11 +143,24 @@ const Index = () => {
             </h1>
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Plan your goals and tasks across multiple months. Create items and assign them to the months they matter most.
+            Plan your goals and tasks across multiple months with smart tags and categories.
           </p>
         </div>
 
-        {/* Main Content */}
+        {/* Navigation Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Calendar
+            </TabsTrigger>
+            <TabsTrigger value="tags" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Manage Tags
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="calendar" className="space-y-8">
         {selectedMonth === null ? (
           <div className="space-y-8">
             {/* Stats Card */}
@@ -85,7 +172,7 @@ const Index = () => {
                   </h2>
                   <p className="text-muted-foreground">
                     You have <span className="font-semibold text-primary">{items.length}</span> items 
-                    {items.length === 1 ? '' : 's'} planned across your calendar
+                    {items.length === 1 ? '' : 's'} and <span className="font-semibold text-accent">{tags.length}</span> tags
                   </p>
                 </div>
                 <Button 
@@ -103,7 +190,7 @@ const Index = () => {
             <MonthGrid
               selectedMonth={selectedMonth}
               onMonthSelect={handleMonthSelect}
-              getItemsForMonth={getItemsForMonth}
+              getItemsForMonth={getItemsForMonthWithTags}
             />
           </div>
         ) : (
@@ -144,17 +231,63 @@ const Index = () => {
               items={selectedMonthItems}
               onEdit={handleEditItem}
               onDelete={handleDeleteItem}
+              categoryTags={categoryTags}
+              calendarTags={calendarTags}
             />
           </div>
         )}
+          </TabsContent>
 
-        {/* Item Modal */}
+          <TabsContent value="tags" className="space-y-6">
+            {/* Tags Management Header */}
+            <Card className="p-6 bg-card shadow-card">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="text-center sm:text-left">
+                  <h2 className="text-2xl font-semibold text-foreground mb-2">
+                    Manage Tags
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Create categories and calendar tags to organize your items better
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleAddTag}
+                  className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-soft"
+                  size="lg"
+                >
+                  <Plus className="mr-2 h-5 w-5" />
+                  Create Tag
+                </Button>
+              </div>
+            </Card>
+
+            {/* Tags List */}
+            <TagsList
+              tags={tags}
+              onEdit={handleEditTag}
+              onDelete={handleDeleteTag}
+            />
+          </TabsContent>
+        </Tabs>
+
+        {/* Modals */}
         <ItemModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isItemModalOpen}
+          onClose={() => setIsItemModalOpen(false)}
           onSave={handleSaveItem}
           onUpdate={handleUpdateItem}
           editingItem={editingItem}
+          categoryTags={categoryTags}
+          calendarTags={calendarTags}
+          getMonthsFromCalendarTags={getMonthsFromCalendarTags}
+        />
+        
+        <TagModal
+          isOpen={isTagModalOpen}
+          onClose={() => setIsTagModalOpen(false)}
+          onSave={handleSaveTag}
+          onUpdate={handleUpdateTag}
+          editingTag={editingTag}
         />
       </div>
     </div>
