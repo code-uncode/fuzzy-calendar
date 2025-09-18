@@ -255,22 +255,6 @@ export function ItemModal({
             </div>
           )}
 
-          {/* Preview of all selected months */}
-          {allSelectedMonths.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Total Selected Months ({allSelectedMonths.length})
-              </Label>
-              <div className="flex flex-wrap gap-1 p-2 border border-border rounded-md bg-muted">
-                {allSelectedMonths.map((monthIndex) => (
-                  <Badge key={monthIndex} variant="outline" className="text-xs">
-                    {MONTHS[monthIndex]}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="flex justify-end gap-3 pt-4">
             <Button
               type="button"
