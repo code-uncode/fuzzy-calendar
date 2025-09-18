@@ -116,19 +116,11 @@ export function ItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] bg-card animate-scale-in">
+      <DialogContent className="sm:max-w-[600px] bg-card animate-scale-in max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-foreground">
             {editingItem ? 'Edit Item' : 'Add New Item'}
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-4 top-4 h-8 w-8 p-0"
-            onClick={handleClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
@@ -140,6 +132,11 @@ export function ItemModal({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
               placeholder="Enter item name..."
               className="bg-background"
               required
@@ -284,7 +281,7 @@ export function ItemModal({
             </Button>
             <Button
               type="submit"
-              disabled={!name.trim()}
+              disabled={!name.trim() || allSelectedMonths.length === 0}
               className="bg-gradient-primary hover:opacity-90 transition-opacity"
             >
               {editingItem ? 'Update Item' : 'Add Item'}

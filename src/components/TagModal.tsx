@@ -79,19 +79,11 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px] bg-card animate-scale-in">
+      <DialogContent className="sm:max-w-[500px] bg-card animate-scale-in max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-foreground">
             {editingTag ? 'Edit Tag' : 'Create New Tag'}
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-4 top-4 h-8 w-8 p-0"
-            onClick={handleClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
@@ -103,6 +95,11 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
               id="tag-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
               placeholder="Enter tag name..."
               className="bg-background"
               required
