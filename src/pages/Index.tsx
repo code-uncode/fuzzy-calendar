@@ -280,6 +280,7 @@ const Index = () => {
           categoryTags={categoryTags}
           calendarTags={calendarTags}
           getMonthsFromCalendarTags={getMonthsFromCalendarTags}
+          preselectedMonth={selectedMonth}
         />
         
         <TagModal

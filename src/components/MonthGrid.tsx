@@ -9,11 +9,14 @@ interface MonthGridProps {
 }
 
 export function MonthGrid({ selectedMonth, onMonthSelect, getItemsForMonth }: MonthGridProps) {
+  const currentMonth = new Date().getMonth();
+  
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {MONTHS.map((month, index) => {
         const itemCount = getItemsForMonth(index).length;
         const isSelected = selectedMonth === index;
+        const isCurrent = index === currentMonth;
         
         return (
           <Card
@@ -22,6 +25,8 @@ export function MonthGrid({ selectedMonth, onMonthSelect, getItemsForMonth }: Mo
               relative p-6 cursor-pointer transition-all duration-300 hover:shadow-soft hover:-translate-y-1
               ${isSelected 
                 ? 'bg-gradient-primary text-primary-foreground shadow-soft scale-105' 
+                : isCurrent
+                ? 'bg-accent/20 border-accent hover:bg-accent/30'
                 : 'bg-card hover:bg-secondary/50'
               }
             `}

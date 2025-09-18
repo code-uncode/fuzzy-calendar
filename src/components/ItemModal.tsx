@@ -18,6 +18,7 @@ interface ItemModalProps {
   categoryTags: Tag[];
   calendarTags: Tag[];
   getMonthsFromCalendarTags: (tagIds: string[]) => number[];
+  preselectedMonth?: number | null;
 }
 
 export function ItemModal({ 
@@ -28,7 +29,8 @@ export function ItemModal({
   editingItem, 
   categoryTags, 
   calendarTags, 
-  getMonthsFromCalendarTags 
+  getMonthsFromCalendarTags,
+  preselectedMonth 
 }: ItemModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -46,11 +48,11 @@ export function ItemModal({
     } else {
       setName('');
       setDescription('');
-      setSelectedMonths([]);
+      setSelectedMonths(preselectedMonth !== null ? [preselectedMonth] : []);
       setSelectedCategoryTags([]);
       setSelectedCalendarTags([]);
     }
-  }, [editingItem, isOpen]);
+  }, [editingItem, isOpen, preselectedMonth]);
 
   // Get all months from calendar tags
   const monthsFromCalendarTags = getMonthsFromCalendarTags(selectedCalendarTags);
