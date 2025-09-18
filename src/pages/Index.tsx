@@ -9,6 +9,7 @@ import { TagsList } from '@/components/TagsList';
 import { TagFilter } from '@/components/TagFilter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarItem, MONTHS, Tag } from '@/types/item';
 import { Plus, Calendar, ArrowLeft, Hash, Settings } from 'lucide-react';
@@ -236,9 +237,16 @@ const Index = () => {
                     <h2 className="text-2xl font-semibold text-foreground">
                       {MONTHS[selectedMonth]}
                     </h2>
-                    <p className="text-muted-foreground">
-                      {selectedMonthItems.length} {selectedMonthItems.length === 1 ? 'item' : 'items'}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-muted-foreground">
+                        {selectedMonthItems.length} {selectedMonthItems.length === 1 ? 'item' : 'items'}
+                      </p>
+                      {selectedTagIds.length > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {selectedTagIds.length} tag{selectedTagIds.length === 1 ? '' : 's'} filtered
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <Button 
