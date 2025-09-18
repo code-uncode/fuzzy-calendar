@@ -6,6 +6,7 @@ import { ItemsList } from '@/components/ItemsList';
 import { ItemModal } from '@/components/ItemModal';
 import { TagModal } from '@/components/TagModal';
 import { TagsList } from '@/components/TagsList';
+import { TagFilter } from '@/components/TagFilter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,26 +32,29 @@ const Index = () => {
   const [editingItem, setEditingItem] = useState<CalendarItem | null>(null);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [activeTab, setActiveTab] = useState('calendar');
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const { toast } = useToast();
 
   const categoryTags = getCategoryTags();
   const calendarTags = getCalendarTags();
 
-  // Enhanced getItemsForMonth to include calendar tag filtering
+  // Enhanced getItemsForMonth to include calendar tag filtering and tag filters
   const getItemsForMonthWithTags = (month: number) => {
     return items.filter(item => {
-      // Direct month assignment
-      if (item.months.includes(month)) return true;
+      // First check if item belongs to this month
+      const belongsToMonth = item.months.includes(month) || 
+        (item.calendarTags?.length > 0 && 
+         calendarTags.filter(tag => item.calendarTags.includes(tag.id))
+           .some(tag => tag.months?.includes(month)));
       
-      // Calendar tag assignment
-      if (item.calendarTags?.length > 0) {
-        const itemCalendarTags = calendarTags.filter(tag => 
-          item.calendarTags.includes(tag.id)
-        );
-        return itemCalendarTags.some(tag => tag.months?.includes(month));
-      }
+      if (!belongsToMonth) return false;
       
-      return false;
+      // Then apply tag filters if any are selected
+      if (selectedTagIds.length === 0) return true;
+      
+      // Check if item has any of the selected tags
+      const itemTagIds = [...(item.categoryTags || []), ...(item.calendarTags || [])];
+      return selectedTagIds.some(tagId => itemTagIds.includes(tagId));
     });
   };
 
@@ -129,6 +133,18 @@ const Index = () => {
     });
   };
 
+  const handleTagSelect = (tagId: string) => {
+    setSelectedTagIds(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  const handleClearFilter = () => {
+    setSelectedTagIds([]);
+  };
+
   const selectedMonthItems = selectedMonth !== null ? getItemsForMonthWithTags(selectedMonth) : [];
 
   return (
@@ -185,6 +201,15 @@ const Index = () => {
                 </Button>
               </div>
             </Card>
+
+            {/* Tag Filter */}
+            <TagFilter
+              categoryTags={categoryTags}
+              calendarTags={calendarTags}
+              selectedTagIds={selectedTagIds}
+              onTagSelect={handleTagSelect}
+              onClearFilter={handleClearFilter}
+            />
 
             {/* Month Grid */}
             <MonthGrid
