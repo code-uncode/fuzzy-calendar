@@ -32,6 +32,15 @@ export function useTags() {
   }, [tags]);
 
   const addTag = (tag: Omit<Tag, 'id' | 'createdAt'>) => {
+    // Check for duplicate names
+    const isDuplicate = tags.some(existingTag => 
+      existingTag.name.toLowerCase().trim() === tag.name.toLowerCase().trim()
+    );
+    
+    if (isDuplicate) {
+      throw new Error('A tag with this name already exists');
+    }
+
     const newTag: Tag = {
       ...tag,
       id: crypto.randomUUID(),
@@ -42,6 +51,18 @@ export function useTags() {
   };
 
   const updateTag = (id: string, updates: Partial<Omit<Tag, 'id' | 'createdAt'>>) => {
+    // Check for duplicate names if name is being updated
+    if (updates.name) {
+      const isDuplicate = tags.some(existingTag => 
+        existingTag.id !== id && 
+        existingTag.name.toLowerCase().trim() === updates.name!.toLowerCase().trim()
+      );
+      
+      if (isDuplicate) {
+        throw new Error('A tag with this name already exists');
+      }
+    }
+
     setTags(prev =>
       prev.map(tag =>
         tag.id === id ? { ...tag, ...updates } : tag

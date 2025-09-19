@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Tag } from '@/types/item';
+import { Tag, TAG_COLORS } from '@/types/item';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { MONTHS } from '@/types/item';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface TagModalProps {
   isOpen: boolean;
@@ -15,17 +16,22 @@ interface TagModalProps {
   onSave: (tag: Omit<Tag, 'id' | 'createdAt'>) => void;
   onUpdate?: (id: string, updates: Partial<Omit<Tag, 'id' | 'createdAt'>>) => void;
   editingTag?: Tag | null;
+  existingTags?: Tag[];
 }
 
-export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagModalProps) {
+export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag, existingTags = [] }: TagModalProps) {
   const [name, setName] = useState('');
   const [type, setType] = useState<'category' | 'calendar'>('category');
   const [selectedMonths, setSelectedMonths] = useState<number[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string>(TAG_COLORS[0].value);
+  const [error, setError] = useState('');
 
   const resetForm = () => {
     setName('');
     setType('category');
     setSelectedMonths([]);
+    setSelectedColor(TAG_COLORS[0].value);
+    setError('');
   };
 
   const loadEditingTag = () => {
@@ -33,6 +39,7 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
       setName(editingTag.name);
       setType(editingTag.type);
       setSelectedMonths(editingTag.months || []);
+      setSelectedColor(editingTag.color);
     } else {
       resetForm();
     }
@@ -44,24 +51,49 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
     }
   }, [editingTag, isOpen]);
 
+  const checkDuplicateName = (tagName: string) => {
+    const trimmedName = tagName.toLowerCase().trim();
+    return existingTags.some(tag => 
+      tag.id !== editingTag?.id && 
+      tag.name.toLowerCase().trim() === trimmedName
+    );
+  };
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+    if (error && !checkDuplicateName(value)) {
+      setError('');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
+    // Check for duplicate names
+    if (checkDuplicateName(name)) {
+      setError('A tag with this name already exists');
+      return;
+    }
+
     const tagData = {
       name: name.trim(),
       type,
+      color: selectedColor,
       ...(type === 'calendar' && selectedMonths.length > 0 && { months: selectedMonths }),
     };
 
-    if (editingTag && onUpdate) {
-      onUpdate(editingTag.id, tagData);
-    } else {
-      onSave(tagData);
+    try {
+      if (editingTag && onUpdate) {
+        onUpdate(editingTag.id, tagData);
+      } else {
+        onSave(tagData);
+      }
+      onClose();
+      resetForm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
-
-    onClose();
-    resetForm();
   };
 
   const handleMonthToggle = (monthIndex: number) => {
@@ -87,6 +119,13 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="tag-name" className="text-sm font-medium">
               Tag Name *
@@ -94,7 +133,7 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
             <Input
               id="tag-name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => handleNameChange(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -123,6 +162,28 @@ export function TagModal({ isOpen, onClose, onSave, onUpdate, editingTag }: TagM
                 : 'Calendar tags map to specific months (e.g., Q1, Summer)'
               }
             </p>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Tag Color *</Label>
+            <div className="grid grid-cols-6 gap-2">
+              {TAG_COLORS.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  className={`
+                    w-8 h-8 rounded-full border-2 transition-all hover:scale-110
+                    ${selectedColor === color.value 
+                      ? 'border-foreground scale-110 shadow-lg' 
+                      : 'border-border hover:border-muted-foreground'
+                    }
+                  `}
+                  style={{ backgroundColor: `hsl(${color.value})` }}
+                  onClick={() => setSelectedColor(color.value)}
+                  title={color.name}
+                />
+              ))}
+            </div>
           </div>
 
           {type === 'calendar' && (

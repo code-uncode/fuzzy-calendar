@@ -59,6 +59,26 @@ const Index = () => {
     });
   };
 
+  const getTagCountsForMonth = (month: number) => {
+    const monthItems = getItemsForMonthWithTags(month);
+    const tagCounts = new Map<string, number>();
+    
+    monthItems.forEach(item => {
+      const allTagIds = [...(item.categoryTags || []), ...(item.calendarTags || [])];
+      allTagIds.forEach(tagId => {
+        tagCounts.set(tagId, (tagCounts.get(tagId) || 0) + 1);
+      });
+    });
+    
+    return Array.from(tagCounts.entries())
+      .map(([tagId, count]) => ({
+        tag: tags.find(t => t.id === tagId)!,
+        count
+      }))
+      .filter(entry => entry.tag)
+      .sort((a, b) => b.count - a.count);
+  };
+
   const handleMonthSelect = (month: number) => {
     setSelectedMonth(selectedMonth === month ? null : month);
     setActiveTab('calendar');
@@ -110,19 +130,37 @@ const Index = () => {
   };
 
   const handleSaveTag = (tagData: Omit<Tag, 'id' | 'createdAt'>) => {
-    addTag(tagData);
-    toast({
-      title: "Tag created!",
-      description: `"${tagData.name}" tag has been created.`,
-    });
+    try {
+      addTag(tagData);
+      toast({
+        title: "Tag created!",
+        description: `"${tagData.name}" tag has been created.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error creating tag",
+        description: error instanceof Error ? error.message : "Failed to create tag",
+        variant: "destructive",
+      });
+      throw error; // Re-throw so the modal can handle it
+    }
   };
 
   const handleUpdateTag = (id: string, updates: Partial<Omit<Tag, 'id' | 'createdAt'>>) => {
-    updateTag(id, updates);
-    toast({
-      title: "Tag updated!",
-      description: "Your tag has been successfully updated.",
-    });
+    try {
+      updateTag(id, updates);
+      toast({
+        title: "Tag updated!",
+        description: "Your tag has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error updating tag",
+        description: error instanceof Error ? error.message : "Failed to update tag",
+        variant: "destructive",
+      });
+      throw error; // Re-throw so the modal can handle it
+    }
   };
 
   const handleDeleteTag = (id: string) => {
@@ -217,6 +255,7 @@ const Index = () => {
               selectedMonth={selectedMonth}
               onMonthSelect={handleMonthSelect}
               getItemsForMonth={getItemsForMonthWithTags}
+              getTagCountsForMonth={getTagCountsForMonth}
             />
           </div>
         ) : (

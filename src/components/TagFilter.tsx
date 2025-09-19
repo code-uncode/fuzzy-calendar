@@ -45,34 +45,50 @@ export function TagFilter({
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {categoryTags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {categoryTags.map(tag => (
-              <Badge
-                key={tag.id}
-                variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
-                className="cursor-pointer hover:opacity-80 transition-opacity text-xs h-6"
-                onClick={() => onTagSelect(tag.id)}
-              >
-                {tag.name}
-              </Badge>
-            ))}
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Categories</h4>
+            <div className="flex flex-wrap gap-1">
+              {categoryTags.map(tag => (
+                <Badge
+                  key={tag.id}
+                  variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
+                  className="cursor-pointer hover:opacity-80 transition-opacity text-xs h-6"
+                  style={{
+                    backgroundColor: selectedTagIds.includes(tag.id) ? `hsl(${tag.color})` : undefined,
+                    borderColor: `hsl(${tag.color})`,
+                    color: selectedTagIds.includes(tag.id) ? 'white' : `hsl(${tag.color})`
+                  }}
+                  onClick={() => onTagSelect(tag.id)}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
 
         {calendarTags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {calendarTags.map(tag => (
-              <Badge
-                key={tag.id}
-                variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
-                className="cursor-pointer hover:opacity-80 transition-opacity text-xs h-6"
-                onClick={() => onTagSelect(tag.id)}
-              >
-                {tag.name}
-              </Badge>
-            ))}
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Calendar Tags</h4>
+            <div className="flex flex-wrap gap-1">
+              {calendarTags.map(tag => (
+                <Badge
+                  key={tag.id}
+                  variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
+                  className="cursor-pointer hover:opacity-80 transition-opacity text-xs h-6"
+                  style={{
+                    backgroundColor: selectedTagIds.includes(tag.id) ? `hsl(${tag.color})` : undefined,
+                    borderColor: `hsl(${tag.color})`,
+                    color: selectedTagIds.includes(tag.id) ? 'white' : `hsl(${tag.color})`
+                  }}
+                  onClick={() => onTagSelect(tag.id)}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
       </div>
