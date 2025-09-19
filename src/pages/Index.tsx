@@ -225,10 +225,33 @@ const Index = () => {
                   <h2 className="text-2xl font-semibold text-foreground mb-2">
                     Your Calendar Overview
                   </h2>
-                  <p className="text-muted-foreground">
-                    You have <span className="font-semibold text-primary">{items.length}</span> items 
-                    {items.length === 1 ? '' : 's'} and <span className="font-semibold text-accent">{tags.length}</span> tags
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-muted-foreground">
+                      Items: <span className="font-semibold text-primary">{items.length}</span>
+                    </p>
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 items-center">
+                        {tags.map(tag => {
+                          const tagItemCount = items.filter(item => 
+                            item.categoryTags.includes(tag.id) || item.calendarTags.includes(tag.id)
+                          ).length;
+                          return tagItemCount > 0 ? (
+                            <div key={tag.id} className="flex items-center gap-1">
+                              <Badge 
+                                className="text-xs px-2 py-1"
+                                style={{
+                                  backgroundColor: `hsl(${tag.color})`,
+                                  color: 'white'
+                                }}
+                              >
+                                {tag.name}: {tagItemCount}
+                              </Badge>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <Button 
                   onClick={handleAddItem}
