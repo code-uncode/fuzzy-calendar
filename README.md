@@ -1,73 +1,73 @@
-# Welcome to your Lovable project
+# Fuzzy Calendar
 
-## Project info
+A flexible calendar planning application that helps you organize goals and tasks across multiple months using smart tagging and categorization.
 
-**URL**: https://lovable.dev/projects/58203d16-c617-4957-9544-7d586788f995
+## Features
 
-## How can I edit this code?
+### 📅 Multi-Month Planning
+- View all 12 months at a glance in a responsive grid layout
+- Assign items to one or multiple months for flexible scheduling
+- See item counts and tag distributions per month
 
-There are several ways of editing your application.
+### 🏷️ Smart Tagging System
+- **Category Tags**: Organize items by type (e.g., Work, Personal, Health)
+- **Calendar Tags**: Create recurring schedules by assigning months to tags (e.g., "Q1" tag for Jan-Mar)
+- **Color Coding**: Choose from 12 distinct colors for easy visual identification
+- **Unique Tags**: Duplicate tag names are prevented automatically
 
-**Use Lovable**
+### 🔍 Powerful Filtering
+- Filter items by one or multiple tags
+- Visual indicator when filters are active
+- Clear distinction between category and calendar tags in filter UI
+- Quick clear-all filter option
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/58203d16-c617-4957-9544-7d586788f995) and start prompting.
+### 📝 Item Management
+- Create items with names, descriptions, and multiple tag assignments
+- Assign items directly to months or inherit months from calendar tags
+- Edit and delete items with confirmation
+- Maximum of 5 category tags and 5 calendar tags per item
 
-Changes made via Lovable will be committed automatically to this repo.
+### 📊 Overview Dashboard
+- Total item count display
+- Tag-based item counts with color-coded badges
+- Per-month tag distribution in calendar grid
 
-**Use your preferred IDE**
+## Technology Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **React** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling
+- **shadcn/ui** - UI components
+- **Local Storage** - Data persistence
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Getting Started
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Usage
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Create Tags**: Go to "Manage Tags" tab to create category or calendar tags with your preferred colors
+2. **Add Items**: Click "Add New Item" to create tasks/goals with descriptions and tag assignments
+3. **Navigate**: Click on any month to see items scheduled for that period
+4. **Filter**: Use the tag filter to focus on specific categories or calendar periods
 
-**Use GitHub Codespaces**
+## Data Storage
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+All data is stored locally in your browser's localStorage. Your items and tags persist between sessions but are not synced across devices.
 
-## What technologies are used for this project?
+## License
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/58203d16-c617-4957-9544-7d586788f995) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is open source and available under the MIT License.
