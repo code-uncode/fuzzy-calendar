@@ -1,6 +1,7 @@
 # Fuzzy Calendar
 
 A flexible calendar planning application that helps you organize goals and tasks across multiple months using smart tagging and categorization.
+This project has been created with the help of Lovable. It is hosted at [Fuzzy Calendar](https://fuzzy-calendar.lovable.app)
 
 ## Features
 
@@ -41,21 +42,6 @@ A flexible calendar planning application that helps you organize goals and tasks
 - **shadcn/ui** - UI components
 - **Local Storage** - Data persistence
 
-## Getting Started
-
-```sh
-# Clone the repository
-git clone <YOUR_GIT_URL>
-
-# Navigate to the project directory
-cd <YOUR_PROJECT_NAME>
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
 
 ## Usage
 
